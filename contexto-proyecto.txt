@@ -1,0 +1,254 @@
+================================================================
+PROYECTO EDUCATIVO: HILOS Y CORRUTINAS EN ANDROID
+TECSUP — Demo práctica con Jetpack Compose
+================================================================
+
+RAMA ACTIVA: demo/comparativa
+REPOSITORIO: gllanos09/Hilos-Corrutinas
+
+----------------------------------------------------------------
+ESTRUCTURA DEL PROYECTO
+----------------------------------------------------------------
+
+Hilos-Corrutinas/
+├── App1/   → Demo de Hilos (tema: fábrica industrial)
+├── App2/   → Demo de Corrutinas (tema: cocina/restaurante)
+├── App3/   → No forma parte de esta demo (ignorar)
+├── App4/   → No forma parte de esta demo (ignorar)
+└── README.md
+
+Nota: Cada app se abre de forma independiente en Android Studio
+      (File → Open → seleccionar carpeta App1/ o App2/)
+
+----------------------------------------------------------------
+APP 1 — DEMO DE HILOS
+----------------------------------------------------------------
+
+Carpeta:    App1/
+Paquete:    com.tecsup.app1
+Tema:       Fábrica industrial (colores oscuros, acero, naranja)
+Archivo principal de UI:
+  App1/app/src/main/java/com/tecsup/app1/ui/screen/HilosScreen.kt
+
+CONCEPTO QUE DEMUESTRA:
+  La diferencia entre ejecutar trabajo pesado en el hilo principal
+  (main thread) versus hacerlo en un hilo secundario (background thread).
+
+ELEMENTOS EN PANTALLA:
+
+  1. Panel de control (botón contador)
+     - Sirve como detector: si puedes tocarlo mientras procesa,
+       la UI está viva y no está bloqueada.
+     - Tiene luz LED: verde = panel activo, rojo = panel bloqueado.
+
+  2. Sección "SIN hilo secundario" (fondo rojo oscuro)
+     - Llama Thread.sleep(3000) directamente en el main thread.
+     - La UI se congela por completo durante 3 segundos.
+     - No puedes tocar el botón contador ni interactuar con nada.
+     - Diagrama visual: Main Thread → Thread.sleep() → UI Frozen
+
+  3. Sección "CON hilo secundario" (fondo verde oscuro)
+     - Lanza un Thread secundario que duerme 3 segundos.
+     - Usa Handler.post{} para actualizar la UI desde el hilo secundario.
+     - El main thread queda libre: el contador sigue funcionando.
+     - Diagrama visual: Hilo 1 (Main Thread → UI libre) en paralelo con
+       Hilo 2 (Thread secundario → Handler.post)
+
+  4. Pantalla de estado (📟 terminal)
+     - Muestra mensajes de lo que está ocurriendo.
+
+CÓDIGO CLAVE:
+
+  // ❌ SIN hilo — bloquea el main thread
+  procesando = true
+  estado = "Máquina operando en el hilo principal... UI congelada"
+  Thread.sleep(3000)        // ← toda la UI se congela aquí
+  estado = "Operación terminada"
+  procesando = false
+
+  // ✅ CON hilo — el main thread queda libre
+  estado = "Máquina corriendo en hilo secundario..."
+  Thread {
+      Thread.sleep(3000)    // ← solo este hilo duerme
+      handler.post {
+          estado = "Operación terminada"   // ← vuelve al main thread
+      }
+  }.start()
+
+PALETA DE COLORES:
+  AceroOscuro  #1C1C2E  (fondo principal)
+  Acero        #2D2D44
+  AceroClaro   #3D3D5C
+  Plata        #B0BEC5
+  PlataClara   #ECEFF1
+  Naranja      #FF6F00  (botones, acento)
+  Verde        #00C853  (estado activo)
+  Rojo         #D50000  (estado bloqueado)
+
+----------------------------------------------------------------
+APP 2 — DEMO DE CORRUTINAS
+----------------------------------------------------------------
+
+Carpeta:    App2/
+Paquete:    com.tecsup.app2
+Tema:       Cocina / Restaurante (colores cálidos, madera, crema)
+Archivo principal de UI:
+  App2/app/src/main/java/com/tecsup/app2/ui/screen/CorrutinasScreen.kt
+
+CONCEPTO QUE DEMUESTRA:
+  La diferencia entre bloquear el hilo principal con Thread.sleep
+  versus suspender una corrutina con delay(), y cómo las corrutinas
+  permiten ejecutar múltiples tareas en paralelo de forma simple.
+
+ELEMENTOS EN PANTALLA:
+
+  1. Botón "Llamar al mesero" (contador)
+     - Mismo detector que App1.
+     - Si puedes tocarlo mientras se cocina, la cocina no bloqueó al mesero.
+
+  2. Sección "SIN corrutinas" (fondo rojo oscuro)
+     - Un solo cocinero que atiende pedidos en cola (secuencial).
+     - Usa Thread.sleep() tres veces: 3s + 2s + 1s = 6s total.
+     - La UI se congela todo ese tiempo.
+     - Cola visual: Pizza (#1, 3s) → Hamburguesa (#2, 2s) → Ensalada (#3, 1s)
+
+  3. Sección "CON corrutinas" (fondo verde oscuro)
+     - 3 cocineros simultáneos, uno por plato.
+     - Cada corrutina corre en paralelo con delay() sin bloquear.
+     - Tiempo total: 3s (el más largo), no 6s.
+     - Estaciones con estados visuales:
+         gris   = esperando
+         naranja = cocinando (🔥)
+         verde  = listo (✅)
+
+CÓDIGO CLAVE:
+
+  // ❌ SIN corrutinas — bloquea el main thread, tareas en cola
+  estadoSin = "Cocinando Pizza..."
+  Thread.sleep(3000)           // ← bloquea 3s
+  estadoSin = "Cocinando Hamburguesa..."
+  Thread.sleep(2000)           // ← bloquea 2s más
+  estadoSin = "Cocinando Ensalada..."
+  Thread.sleep(1000)           // ← bloquea 1s más
+  estadoSin = "Listos — 6 segundos (3+2+1 en cola)"
+
+  // ✅ CON corrutinas — 3 tareas en paralelo, UI libre
+  scope.launch {
+      estadoPizza = "cocinando"
+      delay(3000)              // ← suspende sin bloquear
+      estadoPizza = "listo (3s)"
+  }
+  scope.launch {               // ← corre en paralelo
+      estadoBurger = "cocinando"
+      delay(2000)
+      estadoBurger = "listo (2s)"
+  }
+  scope.launch {               // ← corre en paralelo
+      estadoEnsalada = "cocinando"
+      delay(1000)
+      estadoEnsalada = "listo (1s)"
+  }
+  // Resultado: todos terminan en 3s (no 6s)
+
+PALETA DE COLORES:
+  Madera       #5D4037  (fondo, botones)
+  MaderaClara  #8D6E63
+  Crema        #FFF8E1  (texto principal)
+  CremaOscura  #FFECB3
+  Fuego        #FF6F00  (estado cocinando)
+  Verde        #2E7D32  (estado listo)
+  Rojo         #C62828  (sección sin corrutinas)
+  Gradiente fondo: #3E2723 → #5D4037 → #4E342E
+
+----------------------------------------------------------------
+DIFERENCIA ENTRE HILO Y CORRUTINA
+----------------------------------------------------------------
+
+  HILOS (Threads):
+  - Son unidades de ejecución del sistema operativo.
+  - Cada hilo consume ~1MB de memoria.
+  - Thread.sleep() bloquea el hilo completo.
+  - Comunicación con la UI requiere Handler.post{}.
+  - Más verboso y difícil de coordinar.
+  - Considerado "legacy" en Android moderno.
+
+  CORRUTINAS:
+  - Son unidades de ejecución gestionadas por Kotlin.
+  - Muy ligeras: pueden existir miles sin problema.
+  - delay() suspende la corrutina sin bloquear el hilo.
+  - El código parece secuencial pero no bloquea.
+  - Fácil de lanzar en paralelo con scope.launch{}.
+  - Recomendado en Android moderno.
+
+  COMPARATIVA:
+
+  | Aspecto         | App1 (Hilos)            | App2 (Corrutinas)         |
+  |-----------------|-------------------------|---------------------------|
+  | Mecanismo       | Thread + Handler        | scope.launch + delay()    |
+  | Bloqueo         | Thread.sleep()          | delay() (no bloquea)      |
+  | Código          | Más verboso             | Más simple y legible      |
+  | Paralelismo     | Necesita más código     | scope.launch en paralelo  |
+  | Uso hoy en día  | Legacy                  | Recomendado               |
+
+----------------------------------------------------------------
+ACLARACIÓN IMPORTANTE: ES UNA SIMULACIÓN
+----------------------------------------------------------------
+
+  En ambas apps, el trabajo "pesado" está SIMULADO con:
+    - Thread.sleep(milisegundos)  → en hilos
+    - delay(milisegundos)         → en corrutinas
+
+  Esto significa que no se está haciendo trabajo real, solo
+  esperando un tiempo fijo para demostrar el comportamiento.
+
+  En una app real, ese tiempo sería ocupado por:
+    - Llamadas a una API (Retrofit, OkHttp)
+    - Consultas a base de datos (Room)
+    - Procesamiento de imágenes o archivos
+    - Lectura/escritura de almacenamiento
+
+  El comportamiento del hilo es IDÉNTICO en ambos casos:
+  Thread.sleep(3000) y una llamada real de red de 3s bloquean
+  el main thread de la misma manera. La simulación es válida
+  para demostrar el mecanismo.
+
+----------------------------------------------------------------
+STACK TECNOLÓGICO
+----------------------------------------------------------------
+
+  Lenguaje:     Kotlin 2.x
+  UI:           Jetpack Compose + Material 3
+  Corrutinas:   kotlinx-coroutines-android:1.10.1 (solo App2)
+  minSdk:       24 (Android 7.0)
+  targetSdk:    36
+  compileSdk:   36
+
+----------------------------------------------------------------
+CÓMO ABRIR EN ANDROID STUDIO
+----------------------------------------------------------------
+
+  1. File → Open
+  2. Selecciona la carpeta App1/ o App2/ (NO la carpeta raíz)
+  3. Sync Gradle → Run
+
+  ⚠️ No abrir la carpeta raíz Hilos-Corrutinas/ directamente.
+     Cada app es un proyecto independiente de Android Studio.
+
+----------------------------------------------------------------
+NOTAS DE COMPATIBILIDAD GRADLE
+----------------------------------------------------------------
+
+  Si hay errores de compilación, verificar en
+  gradle/libs.versions.toml de cada app:
+
+    agp = "8.9.2"    (no usar 9.x, requiere Android Studio más nuevo)
+
+  En app/build.gradle.kts usar:
+    compileSdk = 36   (entero, no bloque release{})
+
+  En gradle.properties agregar si falta:
+    android.useAndroidX=true
+
+================================================================
+FIN DEL DOCUMENTO
+================================================================
