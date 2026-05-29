@@ -4,7 +4,7 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import com.tecsup.app2.ui.screen.BancoScreen
+import com.tecsup.app2.ui.screen.CorrutinasScreen
 import com.tecsup.app2.ui.theme.App2Theme
 
 class MainActivity : ComponentActivity() {
@@ -13,7 +13,7 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             App2Theme {
-                BancoScreen()
+                CorrutinasScreen()
             }
         }
     }
