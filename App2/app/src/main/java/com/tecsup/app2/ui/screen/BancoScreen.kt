@@ -119,7 +119,7 @@ fun BancoScreen() {
                 text = "La llamada HTTP se hace en un Thread secundario. " +
                         "El resultado regresa al main thread con Handler(Looper.getMainLooper()).post{}. " +
                         "La UI nunca se bloquea.",
-                modifier = Modifier.padding(horizontal = 12.dp, bottom = 8.dp),
+                modifier = Modifier.padding(start = 12.dp, end = 12.dp, bottom = 8.dp),
                 color = Color(0xFF1B5E20),
                 fontSize = 13.sp
             )

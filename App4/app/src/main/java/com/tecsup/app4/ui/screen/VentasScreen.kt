@@ -72,7 +72,7 @@ fun VentasScreen(viewModel: VentasViewModel) {
             Text(
                 text = "viewModelScope.launch { delay(2000) } reemplaza todo el boilerplate " +
                         "de Thread + Handler. El código es conciso, seguro y lifecycle-aware.",
-                modifier = Modifier.padding(horizontal = 12.dp, bottom = 8.dp),
+                modifier = Modifier.padding(start = 12.dp, end = 12.dp, bottom = 8.dp),
                 color = Color(0xFF1B5E20),
                 fontSize = 13.sp
             )

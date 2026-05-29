@@ -146,7 +146,7 @@ fun VentasScreen() {
                 text = "Usamos Thread + Handler para operaciones asíncronas. " +
                         "El código es largo, propenso a errores y difícil de mantener. " +
                         "Compara este código con App 4 (corrutinas).",
-                modifier = Modifier.padding(horizontal = 12.dp, bottom = 8.dp),
+                modifier = Modifier.padding(start = 12.dp, end = 12.dp, bottom = 8.dp),
                 color = Color(0xFFBF360C),
                 fontSize = 13.sp
             )

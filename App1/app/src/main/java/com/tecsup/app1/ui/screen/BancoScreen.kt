@@ -64,7 +64,7 @@ fun BancoScreen() {
                 text = "Esta app llama a la API en el HILO PRINCIPAL (main thread). " +
                         "Android lanzará NetworkOnMainThreadException y la UI se congelará. " +
                         "Esto demuestra por qué NUNCA debes hacer trabajo pesado en el hilo principal.",
-                modifier = Modifier.padding(horizontal = 12.dp, bottom = 8.dp),
+                modifier = Modifier.padding(start = 12.dp, end = 12.dp, bottom = 8.dp),
                 color = Color(0xFFB71C1C),
                 fontSize = 13.sp
             )
