@@ -48,6 +48,11 @@ dependencies {
     implementation(libs.androidx.compose.ui.graphics)
     implementation(libs.androidx.compose.ui.tooling.preview)
     implementation(libs.androidx.compose.material3)
+    // Icons necesarios para botones de acción
+    implementation("androidx.compose.material:material-icons-core")
+    // ViewModel + corrutinas para código limpio y reactivo
+    implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.8.5")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.10.1")
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
